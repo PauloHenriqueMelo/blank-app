@@ -1,9 +1,9 @@
 # app.py
 import streamlit as st
 
-st.set_page_config(page_title="AI Screening — Examples", layout="wide")
+st.set_page_config(page_title="AI Screening — Cards", layout="wide")
 
-# ---------- DATA (5 items) ----------
+# ---- Your 5 items ----
 items = [
     {
         "title": "Clinical-grade human dental pulp stem cells improve adult hippocampal neural regeneration and cognitive deficits in Alzheimer's disease",
@@ -32,98 +32,108 @@ items = [
     },
 ]
 
-def label(x): return "Include" if x == 1 else "Exclude"
+def lab(v): return "Include" if v == 1 else "Exclude"
 def agree(a, b): return a == b
 
-# ---------- STYLE ----------
-st.markdown("""
-<style>
-:root{
-  --bg: #ffffff; --ink:#1f2937; --muted:#6b7280; --card:#ffffff;
-  --ac1:#6A0DAD; --ac2:#8B5CF6; --ok:#16a34a; --bad:#dc2626;
-  --chip:#f3eafd; --bubble:#f9f7ff; --line:#efe7fb;
-  --shadow: 0 8px 24px rgba(0,0,0,0.08);
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#0e1117; --ink:#e5e7eb; --muted:#9ca3af; --card:#111418;
-    --chip:#2a2140; --bubble:#1a1530; --line:#2a2140; --shadow: 0 8px 24px rgba(0,0,0,0.55);
-  }
-}
-.block-container{padding-top:1rem; padding-bottom:2rem;}
-.grid{
-  display:grid; gap:16px;
-  grid-template-columns: repeat(12, minmax(0,1fr));
-}
-.card{
-  grid-column: span 12;
-  background: var(--card); border-radius:18px; box-shadow: var(--shadow);
-  border:1px solid var(--line); padding:16px 16px 14px; position:relative;
-}
-@media (min-width: 900px){
-  .card{ grid-column: span 6; }
-}
-@media (min-width: 1400px){
-  .card{ grid-column: span 4; }
-}
-.leftbar{
-  position:absolute; left:0; top:0; bottom:0; width:6px;
-  background: linear-gradient(180deg, var(--ac1), var(--ac2));
-  border-top-left-radius:18px; border-bottom-left-radius:18px;
-}
-.title{ font-weight:800; color:var(--ink); font-size:16px; margin-left:10px; }
-.row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:8px; }
-.chip{
-  background: var(--chip); color:#4b0082; font-weight:800;
-  padding:6px 10px; border-radius:999px; font-size:13px;
-}
-.bubble{
-  background: var(--bubble); border:1px dashed var(--line);
-  padding:10px 12px; border-radius:12px; color:var(--ink); font-size:14px;
-}
-.kv{ display:flex; align-items:center; gap:6px; }
-.k{ color:var(--muted); font-weight:600; font-size:12px; }
-.v{ font-weight:700; color:var(--ink); }
-.agree{
-  margin-left:auto; font-weight:900; display:flex; align-items:center; gap:6px;
-  padding:6px 10px; border-radius:10px; font-size:13px;
-}
-.agree.ok{ background:rgba(22,163,74,.12); color:var(--ok); border:1px solid rgba(22,163,74,.35); }
-.agree.bad{ background:rgba(220,38,38,.10); color:var(--bad); border:1px solid rgba(220,38,38,.35); }
+# ---- Render as HTML component (forced readable colors) ----
+html_head = """
+<div style="all: initial;">
+  <style>
+    /* App-embedded design system (forced readable colors) */
+    .wrap {
+      font-family: Inter, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: transparent;
+    }
+    .grid {
+      display: grid; gap: 16px;
+      grid-template-columns: repeat(12, minmax(0,1fr));
+    }
+    .card {
+      grid-column: span 12;
+      background: #ffffff;                /* forced white for readability */
+      color: #111827;                     /* dark ink */
+      border: 1px solid #E7DDFC;          /* soft lilac line */
+      border-radius: 18px;
+      box-shadow: 0 10px 28px rgba(106,13,173,0.12);
+      padding: 16px 16px 14px;
+      position: relative;
+    }
+    @media (min-width: 1000px){ .card{ grid-column: span 6; } }
+    @media (min-width: 1400px){ .card{ grid-column: span 4; } }
 
-.sep{ height:10px; }
-</style>
-""", unsafe_allow_html=True)
+    .accent {
+      position:absolute; left:0; top:0; bottom:0; width:6px;
+      background: linear-gradient(180deg,#6A0DAD,#8B5CF6);
+      border-top-left-radius:18px; border-bottom-left-radius:18px;
+    }
 
-# ---------- RENDER ----------
-cards = ['<div class="grid">']
+    .title {
+      font-weight: 800; font-size: 16px; line-height: 1.35;
+      margin: 0 0 10px 10px; color: #2d1b69;
+    }
+
+    /* Dialog bubble for justification */
+    .bubble {
+      background: #F8F5FF;                /* very light purple */
+      border: 1px dashed #D8C9FB;
+      color: #2f2f33;
+      padding: 12px 14px;
+      border-radius: 14px;
+      margin: 2px 0 10px 10px;
+      position: relative;
+    }
+    .bubble:before {
+      content: ""; position: absolute; left: 20px; top: -8px;
+      width: 16px; height: 16px; transform: rotate(45deg);
+      background: #F8F5FF; border-left: 1px dashed #D8C9FB; border-top: 1px dashed #D8C9FB;
+    }
+
+    /* Chips */
+    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-left:10px; }
+    .chip {
+      background: #F3EAFD; color: #4B0082; font-weight: 800;
+      padding: 6px 10px; border-radius: 999px; font-size: 13px;
+      border: 1px solid #E1D6FB;
+    }
+
+    /* Agreement badge */
+    .agree {
+      margin-left: auto; display:flex; align-items:center; gap:8px;
+      padding: 6px 10px; border-radius: 12px; font-weight: 900; font-size: 13px;
+      border: 1px solid;
+    }
+    .ok  { color:#166534; background:#E9FBEE; border-color: #A7F3D0; }
+    .bad { color:#991B1B; background:#FDECEC; border-color: #FCA5A5; }
+
+    /* Small gray label */
+    .k { color:#6B7280; font-size:12px; font-weight:600; }
+  </style>
+  <div class="wrap">
+    <div class="grid">
+"""
+
+cards = []
 for it in items:
     is_agree = agree(it["ai"], it["orig"])
     cards.append(f"""
-    <div class="card">
-      <div class="leftbar"></div>
-      <div class="title">🧾 {it['title']}</div>
-
-      <div class="sep"></div>
-
-      <div class="bubble">💬 {it['just']}</div>
-
-      <div class="row" style="margin-top:10px;">
-        <div class="kv">
+      <div class="card">
+        <div class="accent"></div>
+        <div class="title">🧾 {it['title']}</div>
+        <div class="bubble">💬 {it['just']}</div>
+        <div class="row">
           <div class="k">AI decision</div>
-          <div class="chip">{label(it['ai'])}</div>
-        </div>
-        <div class="kv">
-          <div class="k">Original</div>
-          <div class="chip">{label(it['orig'])}</div>
-        </div>
-
-        <div class="agree {'ok' if is_agree else 'bad'}">
-          {'✅ Agree' if is_agree else '❌ Disagree'}
+          <div class="chip">{lab(it['ai'])}</div>
+          <div class="k" style="margin-left:12px;">Original</div>
+          <div class="chip">{lab(it['orig'])}</div>
+          <div class="agree {'ok' if is_agree else 'bad'}">{'✅ Agree' if is_agree else '❌ Disagree'}</div>
         </div>
       </div>
-    </div>
     """)
-cards.append("</div>")
 
-st.components.v1.html("".join(cards), height=800, scrolling=True)
+html_tail = """
+    </div>
+  </div>
+</div>
+"""
+
+st.components.v1.html(html_head + "".join(cards) + html_tail, height=860, scrolling=True)
