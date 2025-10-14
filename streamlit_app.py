@@ -1,150 +1,129 @@
 # app.py
 import streamlit as st
-import pandas as pd
 
-st.set_page_config(page_title="AI Screening — Labeled Examples", page_icon="🧪", layout="wide")
+st.set_page_config(page_title="AI Screening — Examples", layout="wide")
 
-# ----------------------- DATA (5 EXAMPLES) -----------------------
-# Only title, AI justification, AI decision, original decision, and agreement
-rows = [
+# ---------- DATA (5 items) ----------
+items = [
     {
-        "Title": "Clinical-grade human dental pulp stem cells improve adult hippocampal neural regeneration and cognitive deficits in Alzheimer's disease",
-        "AI_Justification": "Study does not use AI and involves adult Alzheimer’s disease (non-pediatric surgical pathology).",
-        "AI_Decision": 0,
-        "Original_Decision": 0
+        "title": "Clinical-grade human dental pulp stem cells improve adult hippocampal neural regeneration and cognitive deficits in Alzheimer's disease",
+        "just":  "Study does not use AI and involves adult Alzheimer’s disease (non-pediatric surgical pathology).",
+        "ai": 0, "orig": 0
     },
     {
-        "Title": "Construction of a prognostic prediction model for colorectal cancer based on 5-year clinical follow-up data",
-        "AI_Justification": "Adult colorectal cancer population; not pediatric surgical pathology, so excluded.",
-        "AI_Decision": 0,
-        "Original_Decision": 0
+        "title": "Construction of a prognostic prediction model for colorectal cancer based on 5-year clinical follow-up data",
+        "just":  "Adult colorectal cancer population; not pediatric surgical pathology, so excluded.",
+        "ai": 0, "orig": 0
     },
     {
-        "Title": "Pathological image analysis using the GPU: Stroma classification for neuroblastoma",
-        "AI_Justification": "Develops histopathology image classification for pediatric neuroblastoma (AI + pediatric surgical pathology).",
-        "AI_Decision": 1,
-        "Original_Decision": 0   # from your example
+        "title": "Pathological image analysis using the GPU: Stroma classification for neuroblastoma",
+        "just":  "Develops histopathology image classification for pediatric neuroblastoma (AI + pediatric surgical pathology).",
+        "ai": 1, "orig": 0
     },
     {
-        "Title": "Computer-assisted analysis of medulloblastoma: A cytologic study",
-        "AI_Justification": "Uses clustering/discriminant analysis on pediatric medulloblastoma cytology.",
-        "AI_Decision": 1,
-        "Original_Decision": 0   # from your example
+        "title": "Computer-assisted analysis of medulloblastoma: A cytologic study",
+        "just":  "Uses clustering/discriminant analysis on pediatric medulloblastoma cytology.",
+        "ai": 1, "orig": 0
     },
     {
-        "Title": "Deep Learning and Multidisciplinary Imaging in Pediatric Surgical Oncology: A Scoping Review",
-        "AI_Justification": "Scoping review summarizes studies but does not develop/use/validate an AI model.",
-        "AI_Decision": 0,
-        "Original_Decision": 1   # from your example
+        "title": "Deep Learning and Multidisciplinary Imaging in Pediatric Surgical Oncology: A Scoping Review",
+        "just":  "Scoping review summarizes studies but does not develop/use/validate an AI model.",
+        "ai": 0, "orig": 1
     },
 ]
 
-df = pd.DataFrame(rows)
+def label(x): return "Include" if x == 1 else "Exclude"
+def agree(a, b): return a == b
 
-# Derive readable labels and agreement flag
-label = {1: "Include", 0: "Exclude"}
-df["AI Decision"] = df["AI_Decision"].map(label)
-df["Original Decision"] = df["Original_Decision"].map(label)
-df["Agreement"] = df.apply(lambda r: "✅ Agree" if r["AI_Decision"] == r["Original_Decision"] else "❌ Disagree", axis=1)
-
-# Final view dataframe with only requested columns
-view = df[["Title", "AI_Justification", "AI Decision", "Original Decision", "Agreement"]].rename(
-    columns={"AI_Justification": "AI Justification"}
-)
-
-# ----------------------- STYLES -----------------------
+# ---------- STYLE ----------
 st.markdown("""
 <style>
-:root { --purple:#6A0DAD; --lav:#F3EAFD; --ink:#3C1361; }
-.card {
-  background: linear-gradient(135deg, var(--purple) 0%, #8B5CF6 100%);
-  color: #fff; padding: 16px 18px; border-radius: 14px;
-  box-shadow: 0 10px 24px rgba(106,13,173,0.25); margin: 8px 0 18px 0;
+:root{
+  --bg: #ffffff; --ink:#1f2937; --muted:#6b7280; --card:#ffffff;
+  --ac1:#6A0DAD; --ac2:#8B5CF6; --ok:#16a34a; --bad:#dc2626;
+  --chip:#f3eafd; --bubble:#f9f7ff; --line:#efe7fb;
+  --shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
-.card h1 { font-size: 1.1rem; margin: 0; font-weight: 800; letter-spacing: .2px; }
-.card p { margin: 6px 0 0 0; opacity: .95; }
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0e1117; --ink:#e5e7eb; --muted:#9ca3af; --card:#111418;
+    --chip:#2a2140; --bubble:#1a1530; --line:#2a2140; --shadow: 0 8px 24px rgba(0,0,0,0.55);
+  }
+}
+.block-container{padding-top:1rem; padding-bottom:2rem;}
+.grid{
+  display:grid; gap:16px;
+  grid-template-columns: repeat(12, minmax(0,1fr));
+}
+.card{
+  grid-column: span 12;
+  background: var(--card); border-radius:18px; box-shadow: var(--shadow);
+  border:1px solid var(--line); padding:16px 16px 14px; position:relative;
+}
+@media (min-width: 900px){
+  .card{ grid-column: span 6; }
+}
+@media (min-width: 1400px){
+  .card{ grid-column: span 4; }
+}
+.leftbar{
+  position:absolute; left:0; top:0; bottom:0; width:6px;
+  background: linear-gradient(180deg, var(--ac1), var(--ac2));
+  border-top-left-radius:18px; border-bottom-left-radius:18px;
+}
+.title{ font-weight:800; color:var(--ink); font-size:16px; margin-left:10px; }
+.row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+.chip{
+  background: var(--chip); color:#4b0082; font-weight:800;
+  padding:6px 10px; border-radius:999px; font-size:13px;
+}
+.bubble{
+  background: var(--bubble); border:1px dashed var(--line);
+  padding:10px 12px; border-radius:12px; color:var(--ink); font-size:14px;
+}
+.kv{ display:flex; align-items:center; gap:6px; }
+.k{ color:var(--muted); font-weight:600; font-size:12px; }
+.v{ font-weight:700; color:var(--ink); }
+.agree{
+  margin-left:auto; font-weight:900; display:flex; align-items:center; gap:6px;
+  padding:6px 10px; border-radius:10px; font-size:13px;
+}
+.agree.ok{ background:rgba(22,163,74,.12); color:var(--ok); border:1px solid rgba(22,163,74,.35); }
+.agree.bad{ background:rgba(220,38,38,.10); color:var(--bad); border:1px solid rgba(220,38,38,.35); }
 
-.tbl-wrap {
-  background: #fff; border-radius: 14px; overflow: hidden;
-  box-shadow: 0 10px 24px rgba(0,0,0,.06);
-}
-.tbl {
-  width: 100%; border-collapse: separate; border-spacing: 0;
-  font-family: Inter, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-}
-.tbl thead th {
-  background: var(--lav); color: var(--ink); font-weight: 800; font-size: 14px;
-  text-align: left; padding: 14px 16px; border-bottom: 1px solid #E7DDFC;
-}
-.tbl tbody td {
-  font-size: 14px; color: #1F2937; padding: 12px 16px; border-bottom: 1px solid #F1F0F5; vertical-align: top;
-}
-.tbl tbody tr:nth-child(even) { background: #FAF7FF; }
-.title { font-weight: 700; color: #4B0082; }
-.badge {
-  display: inline-block; padding: 6px 10px; border-radius: 10px; background: #F3EAFD; color:#4B0082;
-  font-weight: 800; font-variant-numeric: tabular-nums;
-}
-.badge.red { background: #FDECEC; color: #9B1C1C; }
-.badge.green { background: #E9FBEE; color: #116329; }
-.small { color:#6B7280; font-size:12px; }
+.sep{ height:10px; }
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------------- HEADER -----------------------
-st.markdown(f"""
-<div class="card">
-  <h1>🧪 AI Screening — Labeled Examples (5)</h1>
-  <p class="small">Columns: Title · AI Justification · AI Decision · Original Decision · Agreement</p>
-</div>
-""", unsafe_allow_html=True)
+# ---------- RENDER ----------
+cards = ['<div class="grid">']
+for it in items:
+    is_agree = agree(it["ai"], it["orig"])
+    cards.append(f"""
+    <div class="card">
+      <div class="leftbar"></div>
+      <div class="title">🧾 {it['title']}</div>
 
-# ----------------------- HTML TABLE RENDER -----------------------
-def render_table(df_view: pd.DataFrame) -> str:
-    # Build table head
-    html = """
-<div class="tbl-wrap">
-<table class="tbl">
-  <thead>
-    <tr>
-      <th style="width:28%;">Title</th>
-      <th style="width:42%;">AI Justification</th>
-      <th style="width:10%;">AI Decision</th>
-      <th style="width:12%;">Original Decision</th>
-      <th style="width:8%;">Agreement</th>
-    </tr>
-  </thead>
-  <tbody>
-"""
-    # Rows
-    for _, r in df_view.iterrows():
-        agree = r["Agreement"].startswith("✅")
-        agree_badge = f"<span class='badge {'green' if agree else 'red'}'>{r['Agreement']}</span>"
-        html += f"""
-    <tr>
-      <td class="title">{r['Title']}</td>
-      <td>{r['AI Justification']}</td>
-      <td><span class="badge">{r['AI Decision']}</span></td>
-      <td><span class="badge">{r['Original Decision']}</span></td>
-      <td>{agree_badge}</td>
-    </tr>
-"""
-    html += """
-  </tbody>
-</table>
-</div>
-"""
-    return html
+      <div class="sep"></div>
 
-# Render as real HTML so styling is preserved
-st.components.v1.html(render_table(view), height=520, scrolling=True)
+      <div class="bubble">💬 {it['just']}</div>
 
-# Optional: raw data download
-with st.expander("Download data (CSV)"):
-    st.dataframe(view, use_container_width=True, hide_index=True)
-    st.download_button(
-        "Download CSV",
-        data=view.to_csv(index=False).encode("utf-8"),
-        file_name="ai_screening_labeled_examples.csv",
-        mime="text/csv"
-    )
+      <div class="row" style="margin-top:10px;">
+        <div class="kv">
+          <div class="k">AI decision</div>
+          <div class="chip">{label(it['ai'])}</div>
+        </div>
+        <div class="kv">
+          <div class="k">Original</div>
+          <div class="chip">{label(it['orig'])}</div>
+        </div>
+
+        <div class="agree {'ok' if is_agree else 'bad'}">
+          {'✅ Agree' if is_agree else '❌ Disagree'}
+        </div>
+      </div>
+    </div>
+    """)
+cards.append("</div>")
+
+st.components.v1.html("".join(cards), height=800, scrolling=True)
