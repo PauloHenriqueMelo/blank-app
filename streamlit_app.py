@@ -159,7 +159,7 @@ body {{
   border:1px solid {BORDER};
   padding: 8px 10px;
   border-radius: 10px;
-}
+}}
 .th {{ font-weight:760; color:{INDIGO}; background:transparent; }}
 .small {{ color:{SUBTEXT}; font-size:12.5px; }}
 
@@ -206,6 +206,7 @@ body {{
   font-size: 12.5px;
   color:{SUBTEXT};
 }}
+
 @media (max-width: 1100px) {{
   .kpi-grid {{ grid-template-columns: 1fr; }}
   .panel-grid {{ grid-template-columns: 1fr; }}
@@ -218,7 +219,7 @@ st.markdown(CSS, unsafe_allow_html=True)
 # -------------------------------------------------------------------
 # HEADER
 # -------------------------------------------------------------------
-st.markdown(f"""
+st.markdown("""
 <div class="wrap">
   <div class="title">Definition of Outcome</div>
   <div class="subtitle">Quantifiable targets, verification, and why it matters</div>
@@ -231,7 +232,7 @@ st.markdown(f"""
 st.markdown('<div class="wrap"><div class="kpi-grid">', unsafe_allow_html=True)
 
 # KPI 1
-st.markdown(f"""
+st.markdown("""
 <div class="kpi">
   <div class="ribbon"></div>
   <div class="body">
@@ -250,7 +251,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # KPI 2
-st.markdown(f"""
+st.markdown("""
 <div class="kpi">
   <div class="ribbon"></div>
   <div class="body">
@@ -269,7 +270,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # KPI 3
-st.markdown(f"""
+st.markdown("""
 <div class="kpi">
   <div class="ribbon"></div>
   <div class="body">
@@ -295,7 +296,7 @@ st.markdown('</div></div>', unsafe_allow_html=True)
 st.markdown('<div class="wrap"><div class="panel-grid">', unsafe_allow_html=True)
 
 # Left: verification table
-st.markdown(f"""
+st.markdown("""
 <div class="panel">
   <h3>Verification & Acceptance Tests</h3>
   <div class="tr th">
@@ -326,7 +327,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # Right: meaning tiles
-st.markdown(f"""
+st.markdown("""
 <div class="panel">
   <h3>Meaningfulness</h3>
   <div class="meaning">
@@ -351,3 +352,8 @@ st.markdown('</div></div>', unsafe_allow_html=True)
 # -------------------------------------------------------------------
 # FOOTER
 # -------------------------------------------------------------------
+st.markdown("""
+<div class="wrap footer-note">
+  Targets are conservative and auditable. Report with 95% CIs, service-level stratification, and pre-registered metric definitions.
+</div>
+""", unsafe_allow_html=True)
