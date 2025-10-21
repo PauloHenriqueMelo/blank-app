@@ -1,6 +1,16 @@
 [theme]
-base = "light"
-primaryColor = "#6b21a8"
-backgroundColor = "#ffffff"
-secondaryBackgroundColor = "#faf5ff"
-textColor = "#1f152b"
+# ----- COLORS -----
+primaryColor = "#6D28D9"         # main accent (buttons, links, sliders)
+backgroundColor = "#F8F5FF"      # light lavender background
+secondaryBackgroundColor = "#EDE9FE"  # card backgrounds
+textColor = "#1E1B4B"            # dark indigo text
+font = "inter"                   # modern sans-serif (auto-fallback to system fonts)
+
+# ----- LAYOUT -----
+# You can optionally set the default layout here too:
+[server]
+headless = true
+enableCORS = false
+
+[browser]
+gatherUsageStats = false
