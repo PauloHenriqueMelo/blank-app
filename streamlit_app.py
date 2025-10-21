@@ -167,7 +167,6 @@ def risk_card(r):
     """
     html = f"""
     <div class="card">
-      <div class="badge" style="background:{r['badge_color']}">{r['badge']}</div>
       <div class="label-sm" style="color:#fb7185">RISK</div>
       <div class="risk-title">{r['title']}</div>
       {arrow_svg}
@@ -185,7 +184,6 @@ def risk_card(r):
 
 def stat_tile(s):
     html = f"""
-    <div class="tile" style="background:{s['bg']}; border-color:{s['bd']}">
       <div class="big" style="color:{s['fg']}">{s['big']}</div>
       <div class="sub" style="color:{s['fg']}">{s['sub']}</div>
     </div>
