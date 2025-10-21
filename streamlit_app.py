@@ -1,163 +1,213 @@
 import streamlit as st
 
-# -----------------------------------------------------
-# PAGE SETUP
-# -----------------------------------------------------
-st.set_page_config(page_title="Needs Criteria — Clinical & Functional", layout="wide")
+st.set_page_config(page_title="Needs Criteria — Dual Tables", layout="wide")
 
-# --- COLOR SYSTEM (Purple-based theme) ---
-DARK_PURPLE = "#4C1D95"
-MID_PURPLE = "#6D28D9"
-LIGHT_PURPLE = "#EDE9FE"
-PILL_MUST_BG = "#F3E8FF"
-PILL_NICE_BG = "#E0E7FF"
-TEXT_COLOR = "#1E1B4B"
-SUBTEXT_COLOR = "#42307D"
-BORDER_COLOR = "#C4B5FD"
+# -------------------- THEME COLORS (purple) --------------------
+PURPLE_DARK = "#4C1D95"
+PURPLE = "#6D28D9"
+PURPLE_MID = "#7C3AED"
+INDIGO_TEXT = "#1E1B4B"
+LAVENDER_BG = "#F8F5FF"
+CARD_BG = "#FFFFFF"
+MUST_BG = "#F3E8FF"     # light violet
+NICE_BG = "#E0E7FF"     # light periwinkle
+BORDER = "#DDD6FE"
 
-# -----------------------------------------------------
-# GLOBAL CSS STYLES
-# -----------------------------------------------------
-CUSTOM_CSS = f"""
+# -------------------- GLOBAL CSS --------------------
+CSS = f"""
 <style>
+:root {{
+  --purple-dark: {PURPLE_DARK};
+  --purple: {PURPLE};
+  --indigo-text: {INDIGO_TEXT};
+  --lavender: {LAVENDER_BG};
+  --card: {CARD_BG};
+  --must: {MUST_BG};
+  --nice: {NICE_BG};
+  --border: {BORDER};
+}}
+
 body {{
-  background: linear-gradient(120deg, #f8f5ff 0%, #faf7ff 100%);
-  font-family: 'Inter', system-ui, sans-serif;
-  color: {TEXT_COLOR};
+  background: linear-gradient(120deg, var(--lavender), #FBFAFF);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color: var(--indigo-text);
 }}
-.slide {{
-  max-width: 1200px;
+
+.slide-wrap {{
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 1.2rem 1.4rem;
+  padding: 8px 12px 0 12px;
 }}
-.slide h1 {{
-  font-size: 2.6rem;
+
+.header {{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  margin-bottom: 8px;
+}}
+.title {{
   font-weight: 800;
-  margin-bottom: 0.3rem;
-  background: linear-gradient(90deg, {DARK_PURPLE}, {MID_PURPLE});
+  font-size: 32px;
+  letter-spacing: -0.2px;
+  background: linear-gradient(90deg, var(--purple-dark), {PURPLE_MID});
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }}
-.slide h3 {{
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: {SUBTEXT_COLOR};
-  margin-bottom: 1rem;
-}}
-.grid {{
-  display: grid;
+
+.dual {{
+  display:grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.6rem;
+  gap: 18px;
+  align-items:start;
 }}
+
 .card {{
-  background-color: white;
-  border: 1px solid {BORDER_COLOR};
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 1.2rem 1.4rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  transition: transform 0.25s ease;
+  box-shadow: 0 6px 18px rgba(76,29,149,0.06);
+  overflow:hidden;
 }}
-.card:hover {{
-  transform: translateY(-3px);
+
+.card-header {{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding: 12px 16px;
+  font-weight: 750;
+  font-size: 22px;
+  color: var(--purple-dark);
+  background: linear-gradient(180deg, #F5F0FF, #F8F6FF);
+  border-bottom: 1px solid var(--border);
 }}
-.card h2 {{
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: {DARK_PURPLE};
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+
+.icon-check {{
+  width:18px; height:18px; display:inline-block; background: var(--purple);
+  -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.2 4.8 12 3.4 13.4 9 19 21 7 19.6 5.6z" fill="black"/></svg>') no-repeat center/contain;
+          mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.2 4.8 12 3.4 13.4 9 19 21 7 19.6 5.6z" fill="black"/></svg>') no-repeat center/contain;
 }}
-.pill {{
-  display: flex;
-  align-items: flex-start;
-  padding: 0.75rem 1rem;
-  margin-bottom: 0.6rem;
-  border-radius: 10px;
+
+.icon-diamond {{
+  width:18px; height:18px; display:inline-block; background: var(--purple);
+  -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3 21 12 12 21 3 12 12 3z" fill="black"/></svg>') no-repeat center/contain;
+          mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3 21 12 12 21 3 12 12 3z" fill="black"/></svg>') no-repeat center/contain;
+}}
+
+.rows {{
+  display:flex;
+  flex-direction:column;
+  padding: 10px 12px 14px 12px;
+  gap: 10px;
+}}
+
+.row {{
+  display:grid;
+  grid-template-columns: 220px 1fr;   /* fixed label column; fluid text column */
+  align-items:start;
+  gap: 14px;
+  background: var(--must);
+  border-left: 6px solid var(--purple);
+  border-radius: 12px;
+  padding: 10px 12px;
   line-height: 1.35;
-  transition: all 0.25s ease;
-  font-size: 1.05rem;
-  font-weight: 450;
+  font-size: 16.5px;
 }}
-.pill.must {{
-  background-color: {PILL_MUST_BG};
-  border-left: 6px solid {MID_PURPLE};
+.row + .row {{ margin-top: 2px; }}
+
+.row .label {{
+  font-weight: 650;
+  color: var(--purple-dark);
+  word-break: break-word;
 }}
-.pill.nice {{
-  background-color: {PILL_NICE_BG};
-  border-left: 6px solid {DARK_PURPLE};
+.row .text {{
+  font-weight: 430;
 }}
-.pill strong {{
-  font-weight: 600;
-  color: {DARK_PURPLE};
+
+.card.nice .row {{
+  background: var(--nice);
+  border-left-color: var(--purple-dark);
 }}
-footer {{
-  font-size: 0.85rem;
-  margin-top: 1rem;
-  color: {SUBTEXT_COLOR};
-  text-align: center;
+
+.note {{
+  padding: 6px 12px 12px 12px;
+  font-size: 12.5px;
+  color:#4B5563;
 }}
-@media (max-width: 980px) {{
-  .grid {{ grid-template-columns: 1fr; }}
-  .slide h1 {{ font-size: 2.1rem; }}
+
+@media (max-width: 1100px) {{
+  .dual {{ grid-template-columns: 1fr; }}
 }}
 </style>
 """
-st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+st.markdown(CSS, unsafe_allow_html=True)
 
-# -----------------------------------------------------
-# PAGE HEADER
-# -----------------------------------------------------
+# -------------------- PAGE HEADER --------------------
 st.markdown("""
-<div class="slide">
-  <h1>Needs Criteria — Clinical & Functional</h1>
-  <h3>Distinguishing measurable <b>Must-Haves</b> from aspirational <b>Nice-to-Haves</b></h3>
+<div class="slide-wrap">
+  <div class="header">
+    <div class="title">Needs Criteria — Clinical & Functional</div>
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
-# -----------------------------------------------------
-# CONTENT
-# -----------------------------------------------------
-must_haves = [
-    "<strong>Accurate mid-case forecast</strong>: Mean absolute error ≤ 5–7 min by 50 % elapsed time; calibration slope 0.9–1.1.",
-    "<strong>Live data fusion</strong>: Integrate anesthesia timestamps, device events, and EHR logs with <10 s latency.",
-    "<strong>Generalizability</strong>: Validated across ≥3 surgical services (general, ortho, vascular).",
-    "<strong>Human-in-the-loop</strong>: Clinician override allowed; interface shows P10–P90 confidence band.",
-    "<strong>Safety guardrails</strong>: Forecasts recommend only (no auto-rebook); full audit trail of adjustments."
+# -------------------- DATA --------------------
+must_rows = [
+    ("Accurate mid-case forecast",
+     "Mean absolute error ≤ 5–7 min at the 50% elapsed mark; calibration slope 0.9–1.1."),
+    ("Live data fusion",
+     "Integrate anesthesia timestamps, device events, and EHR OpTime/SurgiNet logs with < 10 s latency."),
+    ("Generalizability",
+     "Validated across ≥ 3 surgical services (general, orthopedic, vascular) with non-inferiority per service."),
+    ("Human-in-the-loop",
+     "Clinician override available; interface shows P10–P90 confidence band."),
+    ("Safety guardrails",
+     "Recommendations only (no auto re-booking/cancellation); comprehensive audit trail for changes.")
 ]
 
-nice_haves = [
-    "<strong>Case-mix context</strong>: Incorporate BMI, ASA class, resident level, and implant SKU metadata.",
-    "<strong>Explainability</strong>: ‘Top drivers’ visualization (e.g., bleed score↑, scope changes↑).",
-    "<strong>Team prompts</strong>: Predictive turnover and ‘call next patient’ alerts.",
-    "<strong>Learning mode</strong>: Nightly service-specific fine-tuning with seasonal adaptation.",
-    "<strong>Dashboard widgets</strong>: Real-time room status, ETA to close, variance vs plan."
+nice_rows = [
+    ("Case-mix context",
+     "Optional inputs: BMI, ASA class, resident level, implant SKU metadata."),
+    ("Explainability",
+     "Compact ‘Top drivers’ attribution (e.g., bleed score↑, scope exchanges↑)."),
+    ("Team prompts",
+     "Predictive turnover and ‘call next patient’ alerts when thresholds are crossed."),
+    ("Learning mode",
+     "Nightly service-specific fine-tuning; seasonal pattern adaptation."),
+    ("Dashboard widgets",
+     "Tiles for room status, ETA-to-close, and variance vs plan.")
 ]
 
-# Two-column grid
-st.markdown('<div class="slide"><div class="grid">', unsafe_allow_html=True)
+# -------------------- RENDER DUAL CARDS --------------------
+st.markdown('<div class="slide-wrap"><div class="dual">', unsafe_allow_html=True)
 
-# LEFT COLUMN: MUST-HAVES
-st.markdown('<div class="card"><h2>Must-Have</h2>', unsafe_allow_html=True)
-for item in must_haves:
-    st.markdown(f'<div class="pill must">{item}</div>', unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
+# Must-have card
+st.markdown('<div class="card must">', unsafe_allow_html=True)
+st.markdown('<div class="card-header"><span class="icon-check"></span>Must-Have</div>', unsafe_allow_html=True)
+st.markdown('<div class="rows">', unsafe_allow_html=True)
+for label, text in must_rows:
+    st.markdown(f'''
+    <div class="row">
+      <div class="label">{label}</div>
+      <div class="text">{text}</div>
+    </div>
+    ''', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True) # rows
+st.markdown('<div class="note">Specs are concise; left column is fixed width to keep alignment “justified”.</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True) # card
 
-# RIGHT COLUMN: NICE-TO-HAVES
-st.markdown('<div class="card"><h2>Nice-to-Have</h2>', unsafe_allow_html=True)
-for item in nice_haves:
-    st.markdown(f'<div class="pill nice">{item}</div>', unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
+# Nice-to-have card
+st.markdown('<div class="card nice">', unsafe_allow_html=True)
+st.markdown('<div class="card-header"><span class="icon-diamond"></span>Nice-to-Have</div>', unsafe_allow_html=True)
+st.markdown('<div class="rows">', unsafe_allow_html=True)
+for label, text in nice_rows:
+    st.markdown(f'''
+    <div class="row">
+      <div class="label">{label}</div>
+      <div class="text">{text}</div>
+    </div>
+    ''', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True) # rows
+st.markdown('<div class="note">Room for expansion (e.g., predictive staffing, cross-site benchmarking) without clutter.</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True) # card
 
-# Close grid container
-st.markdown('</div></div>', unsafe_allow_html=True)
-
-# -----------------------------------------------------
-# FOOTER
-# -----------------------------------------------------
-st.markdown("""
-<footer>
-Criteria v1.1 · Surgical Innovation Team · Color scheme #4C1D95 #6D28D9 #E0E7FF — Designed Oct 2025
-</footer>
-""", unsafe_allow_html=True)
+st.markdown('</div></div>', unsafe_allow_html=True)  # dual + wrap close
