@@ -1,359 +1,233 @@
+# app.py
 import streamlit as st
+from textwrap import dedent
 
-# -------------------------------------------------------------------
-# PAGE SETUP
-# -------------------------------------------------------------------
-st.set_page_config(page_title="Definition of Outcome — Surgical Innovation", layout="wide")
+st.set_page_config(
+    page_title='Addressing "Killer Risks"',
+    page_icon="🛡️",
+    layout="wide",
+)
 
-# -------------------- PURPLE THEME --------------------
-PURPLE_DARK = "#4C1D95"
-PURPLE = "#6D28D9"
-PURPLE_MID = "#7C3AED"
-INDIGO = "#1E1B4B"
-LAVENDER = "#F8F5FF"
-CARD = "#FFFFFF"
-BORDER = "#DDD6FE"
-SUBTEXT = "#475569"
-
-# -------------------- GLOBAL CSS --------------------
-CSS = f"""
+# ---------- THEME & CSS ----------
+CSS = """
 <style>
-body {{
-  background: radial-gradient(1200px 600px at 10% -10%, #FBFAFF 0%, {LAVENDER} 65%, #FFFFFF 100%);
-  color: {INDIGO};
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-}}
+/* Page background */
+.stApp {
+  background: radial-gradient(1200px 800px at 50% -10%, #1e1b4b 0%, #0b1220 35%, #0b1220 100%);
+  color: #e5e7eb;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji","Segoe UI Emoji";
+}
 
-.wrap {{
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 10px 14px 0 14px;
-}}
+/* Section title */
+.h1-title {
+  text-align:center; 
+  font-size: 2.0rem; 
+  font-weight: 800; 
+  color: #ffffff;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 6px 24px rgba(88,101,242,0.25);
+}
 
-.title {{
-  font-weight: 850;
-  font-size: 34px;
-  letter-spacing: -0.2px;
-  background: linear-gradient(90deg, {PURPLE_DARK}, {PURPLE_MID});
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 4px;
-}}
-.subtitle {{
-  color: {SUBTEXT};
-  font-size: 15px;
-  margin-bottom: 12px;
-}}
+/* Card grid */
+.grid { display:grid; gap: 24px; }
+@media (min-width: 992px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+}
 
-.kpi-grid {{
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-}}
+/* Risk card */
+.card {
+  position: relative;
+  border-radius: 18px;
+  border: 1.5px solid #2b3344;
+  background: linear-gradient(180deg, rgba(20,26,41,.7), rgba(14,20,32,.55));
+  box-shadow: 0 20px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
+  padding: 24px;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.45);
+  border-color: #3b3f55;
+}
 
-.kpi {{
-  background:{CARD};
-  border: 1px solid {BORDER};
-  border-radius: 16px;
-  overflow:hidden;
-  box-shadow: 0 10px 22px rgba(76,29,149,0.07);
-}}
-.kpi .ribbon {{
-  height: 6px;
-  background: linear-gradient(90deg, {PURPLE_DARK}, {PURPLE});
-}}
-.kpi .body {{
-  padding: 12px 14px 14px 14px;
-}}
-
-.kpi .label {{
-  display:flex; align-items:center; gap:10px;
-  color:{PURPLE_DARK};
-  font-weight: 760; font-size: 18px;
-  margin-bottom: 8px;
-}}
-/* monochrome metric icon */
-.icon-metric {{
-  width:18px; height:18px; background:{PURPLE};
-  -webkit-mask:url('data:image/svg+xml;utf8,\
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
-  <path d="M3 3h4v18H3V3Zm7 8h4v10h-4V11Zm7-6h4v16h-4V5Z"/></svg>') no-repeat center/contain;
-          mask:url('data:image/svg+xml;utf8,\
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
-  <path d="M3 3h4v18H3V3Zm7 8h4v10h-4V11Zm7-6h4v16h-4V5Z"/></svg>') no-repeat center/contain;
-}}
-
-.kpi .numbers {{
-  display:grid;
-  grid-template-columns: 1fr 36px 1fr;
-  align-items:center;
-  gap: 8px;
-}}
-.kpi .val {{
-  background:#F3E8FF;
-  border:1px solid {BORDER};
+/* Icon badge */
+.badge {
+  position: absolute;
+  top: -12px; left: 18px;
+  width: 42px; height: 42px;
   border-radius: 12px;
-  padding: 10px;
-  text-align:center;
-}}
-.kpi .val .top {{ font-size:24px; font-weight:820; color:{PURPLE_DARK}; }}
-.kpi .val .sub {{ font-size:12.5px; color:{SUBTEXT}; margin-top:2px; }}
-
-.kpi .arrow {{
-  height: 46px;
   display:flex; align-items:center; justify-content:center;
-}}
-/* rightward arrow */
-.kpi .arrow::before {{
-  content:"";
-  width:24px; height:24px; background:{PURPLE};
-  -webkit-mask:url('data:image/svg+xml;utf8,\
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
-  <path d="M13 5l7 7-7 7v-4H4v-6h9V5z"/></svg>') no-repeat center/contain;
-          mask:url('data:image/svg+xml;utf8,\
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
-  <path d="M13 5l7 7-7 7v-4H4v-6h9V5z"/></svg>') no-repeat center/contain;
-}}
+  color:#fff; font-weight:700; font-size: 18px;
+  box-shadow: 0 10px 20px rgba(0,0,0,.35);
+}
 
-.kpi .delta {{
-  margin-top: 10px;
-  display:flex; align-items:center; justify-content:space-between;
-  font-size: 13px; color:{SUBTEXT};
-}}
-.kpi .delta .gain {{
-  font-weight: 760; color:{PURPLE_DARK}; background:#EDE9FE; border:1px solid {BORDER}; border-radius:8px; padding:4px 8px;
-}}
+/* Labels */
+.label-sm {
+  letter-spacing: .12em; 
+  font-size: .72rem; 
+  font-weight: 700; 
+  opacity:.8; 
+  margin-bottom: .25rem;
+}
 
-.panel-grid {{
-  display:grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 14px;
-  margin-top: 14px;
-}}
+/* Risk title */
+.risk-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: .25rem 0 1.25rem 0;
+  color: #fff;
+}
 
-.panel {{
-  background:{CARD};
-  border:1px solid {BORDER};
+/* Mitigation box */
+.mitig {
   border-radius: 14px;
-  box-shadow: 0 8px 18px rgba(76,29,149,0.06);
-  padding: 12px 14px;
-}}
+  padding: 14px 16px;
+  background: rgba(38,49,69,.6);
+  border: 1px solid rgba(103,232,249,.18);
+}
+.mitig .label-sm { color: #34d399; }
+.mitig p { margin:0; color:#cfd8e3; }
 
-.panel h3 {{
-  margin: 2px 0 8px 0;
-  font-size: 20px;
-  color:{PURPLE_DARK};
-  font-weight: 760;
-}}
-.table {{
-  width:100%;
-  border-collapse: separate;
-  border-spacing: 0 8px;
-  font-size: 15px;
-}}
-.tr {{
-  display:grid;
-  grid-template-columns: 180px 1fr 130px 150px 130px;
-  gap: 10px;
-  background:#F8F6FF;
-  border:1px solid {BORDER};
-  padding: 8px 10px;
-  border-radius: 10px;
-}}
-.th {{ font-weight:760; color:{INDIGO}; background:transparent; }}
-.small {{ color:{SUBTEXT}; font-size:12.5px; }}
+/* Status row */
+.status { display:flex; align-items:center; gap:8px; margin-top: 12px; color:#93a3b8; font-size:.78rem; }
+.dot { width:8px; height:8px; border-radius:999px; }
 
-.meaning {{
-  display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-}}
-.tile {{
-  background:{CARD}; border:1px solid {BORDER}; border-radius: 12px; padding: 12px;
-}}
-.tile h4 {{ margin:0 0 6px 0; font-size: 17px; color:{PURPLE_DARK}; font-weight:760; }}
-.tile p {{ margin:0; font-size: 15px; line-height:1.35; color:{INDIGO}; }}
+/* Animated arrow */
+.arrow {
+  width: 40px; height: 40px; margin: 14px auto;
+  opacity:.9;
+}
+@keyframes drop {
+  0% { transform: translateY(-4px); opacity:.8; }
+  50% { transform: translateY(2px); opacity:1; }
+  100% { transform: translateY(-4px); opacity:.8; }
+}
+.arrow path { animation: drop 1.2s infinite ease-in-out; }
 
-.icon-clin, .icon-pat, .icon-eco {{
-  width:18px; height:18px; background:{PURPLE};
-  display:inline-block; vertical-align:-3px; margin-right:6px;
-}}
-.icon-clin {{
-  -webkit-mask:url('data:image/svg+xml;utf8,\
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
-  <path d="M12 2l4 4-4 4-4-4 4-4Zm-8 18v-6h4v6H4Zm6 0v-8h4v8h-4Zm6 0v-4h4v4h-4Z"/></svg>') no-repeat center/contain;
-          mask:url('data:image/svg+xml;utf8,\
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
-  <path d="M12 2l4 4-4 4-4-4 4-4Zm-8 18v-6h4v6H4Zm6 0v-8h4v8h-4Zm6 0v-4h4v4h-4Z"/></svg>') no-repeat center/contain;
-}}
-.icon-pat {{
-  -webkit-mask:url('data:image/svg+xml;utf8,\
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
-  <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-6 7a6 6 0 0 1 12 0v1H6Z"/></svg>') no-repeat center/contain;
-          mask:url('data:image/svg+xml;utf8,\
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
-  <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-6 7a6 6 0 0 1 12 0v1H6Z"/></svg>') no-repeat center/contain;
-}}
-.icon-eco {{
-  -webkit-mask:url('data:image/svg+xml;utf8,\
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
-  <path d="M3 12c4-6 14-6 18 0-4 6-14 6-18 0Zm8 8h2v-4h-2v4Zm-6-2h2v-2H5v2Zm12 0h2v-2h-2v2Z"/></svg>') no-repeat center/contain;
-          mask:url('data:image/svg+xml;utf8,\
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
-  <path d="M3 12c4-6 14-6 18 0-4 6-14 6-18 0Zm8 8h2v-4h-2v4Zm-6-2h2v-2H5v2Zm12 0h2v-2h-2v2Z"/></svg>') no-repeat center/contain;
-}}
+/* Footer stat tiles */
+.tiles { display:grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 992px) { .tiles { grid-template-columns: repeat(4, 1fr); } }
+.tile {
+  border-radius: 16px; text-align:center; padding: 16px 10px;
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+}
+.tile .big { font-size: 1.6rem; font-weight: 900; margin-bottom: 4px; }
+.tile .sub { font-size: .85rem; opacity:.9; }
 
-.footer-note {{
-  margin-top: 10px;
-  font-size: 12.5px;
-  color:{SUBTEXT};
-}}
+/* Subtle divider spacing */
+.section { margin: 10px 0 26px 0; }
 
-@media (max-width: 1100px) {{
-  .kpi-grid {{ grid-template-columns: 1fr; }}
-  .panel-grid {{ grid-template-columns: 1fr; }}
-  .meaning {{ grid-template-columns: 1fr; }}
-}}
+/* Small helper to clamp width of central container */
+.maxw { max-width: 1200px; margin: 0 auto; }
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
 
-# -------------------------------------------------------------------
-# HEADER
-# -------------------------------------------------------------------
-st.markdown("""
-<div class="wrap">
-  <div class="title">Definition of Outcome</div>
-  <div class="subtitle">Quantifiable targets, verification, and why it matters</div>
-</div>
-""", unsafe_allow_html=True)
+st.markdown('<div class="h1-title">Addressing "Killer Risks"</div>', unsafe_allow_html=True)
 
-# -------------------------------------------------------------------
-# KPI CARDS — BASELINE → TARGET with delta
-# -------------------------------------------------------------------
-st.markdown('<div class="wrap"><div class="kpi-grid">', unsafe_allow_html=True)
+# ---------- DATA ----------
+risks = [
+    {
+        "id": "heterogeneity",
+        "title": "Data Heterogeneity",
+        "mitigation": "Standardized HL7/FHIR streams",
+        "badge": "🧩",
+        "badge_color": "#60a5fa",  # blue
+        "arrow_color": "#60a5fa",
+        "status_color": "#60a5fa",
+    },
+    {
+        "id": "regulatory",
+        "title": "Regulatory Hurdles",
+        "mitigation": "Class II SaMD; early engagement with Health Canada",
+        "badge": "📄",
+        "badge_color": "#a78bfa",  # purple
+        "arrow_color": "#a78bfa",
+        "status_color": "#a78bfa",
+    },
+    {
+        "id": "adoption",
+        "title": "Adoption Resistance",
+        "mitigation": "Co-design with OR staff during pilot",
+        "badge": "👥",
+        "badge_color": "#ec4899",  # pink
+        "arrow_color": "#ec4899",
+        "status_color": "#ec4899",
+    },
+    {
+        "id": "cost",
+        "title": "Cost Justification",
+        "mitigation": "Demonstrated 6–12 month ROI in simulation",
+        "badge": "💵",
+        "badge_color": "#10b981",  # emerald
+        "arrow_color": "#10b981",
+        "status_color": "#10b981",
+    },
+]
 
-# KPI 1
-st.markdown("""
-<div class="kpi">
-  <div class="ribbon"></div>
-  <div class="body">
-    <div class="label"><span class="icon-metric"></span>Forecast Error (Primary)</div>
-    <div class="numbers">
-      <div class="val"><div class="top">±25 min</div><div class="sub">Baseline MAE</div></div>
-      <div class="arrow"></div>
-      <div class="val"><div class="top">±5 min</div><div class="sub">Target (mid-case)</div></div>
+stats = [
+    {"big": "100%", "sub": "Data Standardized", "bg": "rgba(59,130,246,.18)", "fg": "#60a5fa", "bd": "rgba(59,130,246,.35)"},
+    {"big": "Class II", "sub": "SaMD Pathway", "bg": "rgba(167,139,250,.18)", "fg": "#a78bfa", "bd": "rgba(167,139,250,.35)"},
+    {"big": "Co-design", "sub": "With OR Staff", "bg": "rgba(236,72,153,.18)", "fg": "#ec4899", "bd": "rgba(236,72,153,.35)"},
+    {"big": "6–12mo", "sub": "ROI Timeline", "bg": "rgba(16,185,129,.18)", "fg": "#10b981", "bd": "rgba(16,185,129,.35)"},
+]
+
+# ---------- HELPERS ----------
+def risk_card(r):
+    arrow_svg = f"""
+    <svg class="arrow" viewBox="0 0 40 40" fill="none">
+      <path d="M20 10 L20 30 M20 30 L15 25 M20 30 L25 25"
+            stroke="{r['arrow_color']}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    """
+    html = f"""
+    <div class="card">
+      <div class="badge" style="background:{r['badge_color']}">{r['badge']}</div>
+      <div class="label-sm" style="color:#fb7185">RISK</div>
+      <div class="risk-title">{r['title']}</div>
+      {arrow_svg}
+      <div class="mitig">
+        <div class="label-sm">MITIGATION STRATEGY</div>
+        <p>{r['mitigation']}</p>
+      </div>
+      <div class="status">
+        <span class="dot" style="background:{r['status_color']}"></span>
+        <span>Strategy validated</span>
+      </div>
     </div>
-    <div class="delta">
-      <div class="small">Measured at 50% elapsed time; calibrated slope 0.9–1.1</div>
-      <div class="gain">−80% error</div>
-    </div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
+    """
+    st.markdown(html, unsafe_allow_html=True)
 
-# KPI 2
-st.markdown("""
-<div class="kpi">
-  <div class="ribbon"></div>
-  <div class="body">
-    <div class="label"><span class="icon-metric"></span>OR Overtime</div>
-    <div class="numbers">
-      <div class="val"><div class="top">Baseline</div><div class="sub">Avg monthly hours</div></div>
-      <div class="arrow"></div>
-      <div class="val"><div class="top">↓ ≥10%</div><div class="sub">Within 6 months</div></div>
+def stat_tile(s):
+    html = f"""
+    <div class="tile" style="background:{s['bg']}; border-color:{s['bd']}">
+      <div class="big" style="color:{s['fg']}">{s['big']}</div>
+      <div class="sub" style="color:{s['fg']}">{s['sub']}</div>
     </div>
-    <div class="delta">
-      <div class="small">Unit: total overtime hours across elective rooms</div>
-      <div class="gain">Operational gain</div>
-    </div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
+    """
+    st.markdown(html, unsafe_allow_html=True)
 
-# KPI 3
-st.markdown("""
-<div class="kpi">
-  <div class="ribbon"></div>
-  <div class="body">
-    <div class="label"><span class="icon-metric"></span>Patient Cancellations</div>
-    <div class="numbers">
-      <div class="val"><div class="top">Baseline</div><div class="sub">% of elective cases</div></div>
-      <div class="arrow"></div>
-      <div class="val"><div class="top">↓ ≥15%</div><div class="sub">After deployment</div></div>
-    </div>
-    <div class="delta">
-      <div class="small">Denominator: scheduled elective cases per month</div>
-      <div class="gain">Access improvement</div>
-    </div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
+# ---------- LAYOUT ----------
+st.markdown('<div class="maxw">', unsafe_allow_html=True)
 
-st.markdown('</div></div>', unsafe_allow_html=True)
+# Risk grid
+st.markdown('<div class="grid section">', unsafe_allow_html=True)
+for i, r in enumerate(risks):
+    # Place two per row using columns for consistent spacing within Streamlit's flow
+    if i % 2 == 0:
+        c1, c2 = st.columns(2, gap="large")
+        with c1:
+            risk_card(risks[i])
+        if i + 1 < len(risks):
+            with c2:
+                risk_card(risks[i + 1])
+st.markdown('</div>', unsafe_allow_html=True)
 
-# -------------------------------------------------------------------
-# VERIFICATION PANEL (how we’ll measure / prove it)
-# -------------------------------------------------------------------
-st.markdown('<div class="wrap"><div class="panel-grid">', unsafe_allow_html=True)
+# Summary tiles
+st.markdown('<div class="tiles section">', unsafe_allow_html=True)
+for s in stats:
+    stat_tile(s)
+st.markdown('</div>', unsafe_allow_html=True)
 
-# Left: verification table
-st.markdown("""
-<div class="panel">
-  <h3>Verification & Acceptance Tests</h3>
-  <div class="tr th">
-    <div>Metric</div><div>Definition</div><div>Target</div><div>Data Source</div><div>Window</div>
-  </div>
-  <div class="tr">
-    <div>Forecast Error</div>
-    <div>MAE between forecasted remaining time at 50% elapsed and actual remaining time; assess calibration slope/intercept.</div>
-    <div><b>≤ 5–7 min</b>; slope 0.9–1.1</div>
-    <div>Model logs + OR timeline (EHR OpTime/SurgiNet)</div>
-    <div>First <b>200 cases</b> per service</div>
-  </div>
-  <div class="tr">
-    <div>OR Overtime</div>
-    <div>Total hours finishing after scheduled end across elective rooms.</div>
-    <div><b>≥ 10% reduction</b></div>
-    <div>Payroll/OR admin reports</div>
-    <div>Baseline 6 weeks → Follow-up 6 months</div>
-  </div>
-  <div class="tr">
-    <div>Cancellations</div>
-    <div>Cancelled elective cases / scheduled elective cases.</div>
-    <div><b>≥ 15% reduction</b></div>
-    <div>EHR scheduling + daily OR list</div>
-    <div>Monthly, rolling 3-month average</div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
-
-# Right: meaning tiles
-st.markdown("""
-<div class="panel">
-  <h3>Meaningfulness</h3>
-  <div class="meaning">
-    <div class="tile">
-      <h4><span class="icon-clin"></span>Clinical</h4>
-      <p>Fewer late finishes and recovery crunches ⇒ lower staff fatigue and more predictable turnover.</p>
-    </div>
-    <div class="tile">
-      <h4><span class="icon-pat"></span>Patient</h4>
-      <p>Reduced delays and cancellations ⇒ shorter waits and improved experience on day of surgery.</p>
-    </div>
-    <div class="tile">
-      <h4><span class="icon-eco"></span>Economic</h4>
-      <p>Overtime hours reduced and throughput stabilized ⇒ annual savings that scale to millions in tertiary centers.</p>
-    </div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown('</div></div>', unsafe_allow_html=True)
-
-# -------------------------------------------------------------------
-# FOOTER
-# -------------------------------------------------------------------
-st.markdown("""
-<div class="wrap footer-note">
-  Targets are conservative and auditable. Report with 95% CIs, service-level stratification, and pre-registered metric definitions.
-</div>
-""", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
