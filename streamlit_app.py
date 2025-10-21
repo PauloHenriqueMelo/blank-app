@@ -351,8 +351,3 @@ st.markdown('</div></div>', unsafe_allow_html=True)
 # -------------------------------------------------------------------
 # FOOTER
 # -------------------------------------------------------------------
-st.markdown(f"""
-<div class="wrap footer-note">
-  Targets are conservative and auditable; all deltas reported with 95% CIs and service-level stratification.
-</div>
-""", unsafe_allow_html=True)
