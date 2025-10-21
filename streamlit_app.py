@@ -132,8 +132,6 @@ risks = [
         "id": "heterogeneity",
         "title": "Data Heterogeneity",
         "mitigation": "Standardized HL7/FHIR streams",
-        "badge": "🧩",
-        "badge_color": "#60a5fa",  # blue
         "arrow_color": "#60a5fa",
         "status_color": "#60a5fa",
     },
@@ -141,8 +139,6 @@ risks = [
         "id": "regulatory",
         "title": "Regulatory Hurdles",
         "mitigation": "Class II SaMD; early engagement with Health Canada",
-        "badge": "📄",
-        "badge_color": "#a78bfa",  # purple
         "arrow_color": "#a78bfa",
         "status_color": "#a78bfa",
     },
@@ -150,8 +146,6 @@ risks = [
         "id": "adoption",
         "title": "Adoption Resistance",
         "mitigation": "Co-design with OR staff during pilot",
-        "badge": "👥",
-        "badge_color": "#ec4899",  # pink
         "arrow_color": "#ec4899",
         "status_color": "#ec4899",
     },
@@ -159,8 +153,6 @@ risks = [
         "id": "cost",
         "title": "Cost Justification",
         "mitigation": "Demonstrated 6–12 month ROI in simulation",
-        "badge": "💵",
-        "badge_color": "#10b981",  # emerald
         "arrow_color": "#10b981",
         "status_color": "#10b981",
     },
