@@ -176,7 +176,6 @@ def risk_card(r):
       </div>
       <div class="status">
         <span class="dot" style="background:{r['status_color']}"></span>
-        <span>Strategy validated</span>
       </div>
     </div>
     """
