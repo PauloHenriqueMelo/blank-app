@@ -50,16 +50,8 @@ CSS = """
   border-color: #3b3f55;
 }
 
-/* Icon badge */
-.badge {
-  position: absolute;
-  top: -12px; left: 18px;
-  width: 42px; height: 42px;
-  border-radius: 12px;
-  display:flex; align-items:center; justify-content:center;
-  color:#fff; font-weight:700; font-size: 18px;
-  box-shadow: 0 10px 20px rgba(0,0,0,.35);
-}
+
+
 
 /* Labels */
 .label-sm {
