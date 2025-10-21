@@ -1,139 +1,208 @@
-# app.py
 import streamlit as st
 
-st.set_page_config(page_title="AI Screening — Cards", layout="wide")
+st.set_page_config(page_title="Needs Criteria — Slide 1", page_icon="🧠", layout="wide")
 
-# ---- Your 5 items ----
-items = [
-    {
-        "title": "Clinical-grade human dental pulp stem cells improve adult hippocampal neural regeneration and cognitive deficits in Alzheimer's disease",
-        "just":  "Study does not use AI and involves adult Alzheimer’s disease (non-pediatric surgical pathology).",
-        "ai": 0, "orig": 0
-    },
-    {
-        "title": "Construction of a prognostic prediction model for colorectal cancer based on 5-year clinical follow-up data",
-        "just":  "Adult colorectal cancer population; not pediatric surgical pathology, so excluded.",
-        "ai": 0, "orig": 0
-    },
-    {
-        "title": "Pathological image analysis using the GPU: Stroma classification for neuroblastoma",
-        "just":  "Develops histopathology image classification for pediatric neuroblastoma (AI + pediatric surgical pathology).",
-        "ai": 1, "orig": 0
-    },
-    {
-        "title": "Computer-assisted analysis of medulloblastoma: A cytologic study",
-        "just":  "Uses clustering/discriminant analysis on pediatric medulloblastoma cytology.",
-        "ai": 1, "orig": 0
-    },
-    {
-        "title": "Deep Learning and Multidisciplinary Imaging in Pediatric Surgical Oncology: A Scoping Review",
-        "just":  "Scoping review summarizes studies but does not develop/use/validate an AI model.",
-        "ai": 0, "orig": 1
-    },
+# ---------- THEME / STYLES ----------
+PRIMARY_GREEN = "#208A3E"
+PRIMARY_BLUE = "#2E6DFF"
+PILL_GREEN_BG = "#E9F6EE"
+PILL_BLUE_BG = "#EAF2FF"
+TEXT_COLOR = "#0F172A"  # slate-900
+SUBTEXT_COLOR = "#334155"  # slate-700
+RULE_COLOR = "#E5E7EB"  # gray-200
+
+CUSTOM_CSS = f"""
+<style>
+/* page padding */
+.main > div {{ padding-top: 10px; }}
+
+.slide-container {{
+  max-width: 1200px;
+  margin: 0 auto;
+}}
+
+.slide-title {{
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: 38px;
+  line-height: 1.1;
+  letter-spacing: -0.3px;
+  color: {TEXT_COLOR};
+  margin: 6px 0 2px 0;
+}}
+
+.slide-subtitle {{
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: {SUBTEXT_COLOR};
+  margin-bottom: 18px;
+}}
+
+.rule {{
+  height: 1px;
+  background: {RULE_COLOR};
+  margin: 8px 0 24px 0;
+  border-radius: 1px;
+}}
+
+.columns-wrap {{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}}
+
+.col-card {{
+  border: 1px solid {RULE_COLOR};
+  border-radius: 16px;
+  padding: 18px 18px 14px 18px;
+  background: white;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}}
+
+.col-title {{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  color: {TEXT_COLOR};
+}}
+
+.icon-must {{
+  width: 18px; height: 18px; display:inline-block;
+  background: {PRIMARY_GREEN};
+  -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>') no-repeat center / contain;
+          mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>') no-repeat center / contain;
+}}
+
+.icon-nice {{
+  width: 18px; height: 18px; display:inline-block;
+  background: {PRIMARY_BLUE};
+  -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="black"/></svg>') no-repeat center / contain;
+          mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="black"/></svg>') no-repeat center / contain;
+}}
+
+.pill {{
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  line-height: 1.25;
+  font-size: 19px;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color: {TEXT_COLOR};
+}}
+
+.pill.must {{
+  background: {PILL_GREEN_BG};
+  border: 1px solid rgba(32,138,62,0.08);
+}}
+
+.pill.nice {{
+  background: {PILL_BLUE_BG};
+  border: 1px solid rgba(46,109,255,0.10);
+}}
+
+.pill strong {{ font-weight: 700; }}
+
+.footer-note {{
+  margin-top: 16px;
+  font-size: 14px;
+  color: {SUBTEXT_COLOR};
+}}
+@media (max-width: 980px) {{
+  .columns-wrap {{ grid-template-columns: 1fr; }}
+  .slide-title {{ font-size: 32px; }}
+}}
+</style>
+"""
+st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+
+# ---------- PAGE HEADER ----------
+st.markdown(
+    """
+    <div class="slide-container">
+      <div class="slide-title">Needs Criteria — Clinical & Functional</div>
+      <div class="slide-subtitle">Must-Have vs Nice-to-Have (color-coded; concise, measurable, deployable)</div>
+      <div class="rule"></div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# ---------- CONTENT DEFINITIONS ----------
+must_haves = [
+    "<strong>Accurate mid-case forecast</strong>: MAE ≤ 5–7 min by 50% elapsed; calibration slope 0.9–1.1.",
+    "<strong>Live data fusion</strong>: anesthesia timestamps, device events, EHR OpTime/SurgiNet, nurse charting with &lt;10-sec latency.",
+    "<strong>Generalizability</strong>: validated in ≥3 services (general, ortho, vascular) with non-inferiority per service.",
+    "<strong>Human-in-the-loop</strong>: surgeon/anesthetist override; forecast shows confidence band (P10–P90).",
+    "<strong>Safety guardrails</strong>: recommend only (no auto-book/cancel); full audit trail of changes."
 ]
 
-def lab(v): return "Include" if v == 1 else "Exclude"
-def agree(a, b): return a == b
+nice_to_haves = [
+    "<strong>Case-mix context</strong>: BMI, ASA, resident level, implant SKU when available.",
+    "<strong>Explainability</strong>: quick ‘Top drivers’ (e.g., bleed score ↑, scope exchanges ↑).",
+    "<strong>Team prompts</strong>: turnover & ‘call next patient’ alerts on threshold crossings.",
+    "<strong>Learning mode</strong>: nightly service-specific fine-tuning; seasonal patterns.",
+    "<strong>Dashboard widgets</strong>: room status, ETA to close, variance vs plan."
+]
 
-# ---- Render as HTML component (forced readable colors) ----
-html_head = """
-<div style="all: initial;">
-  <style>
-    /* App-embedded design system (forced readable colors) */
-    .wrap {
-      font-family: Inter, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: transparent;
-    }
-    .grid {
-      display: grid; gap: 16px;
-      grid-template-columns: repeat(12, minmax(0,1fr));
-    }
-    .card {
-      grid-column: span 12;
-      background: #ffffff;                /* forced white for readability */
-      color: #111827;                     /* dark ink */
-      border: 1px solid #E7DDFC;          /* soft lilac line */
-      border-radius: 18px;
-      box-shadow: 0 10px 28px rgba(106,13,173,0.12);
-      padding: 16px 16px 14px;
-      position: relative;
-    }
-    @media (min-width: 1000px){ .card{ grid-column: span 6; } }
-    @media (min-width: 1400px){ .card{ grid-column: span 4; } }
+# ---------- RENDER 2-COLUMN SLIDE ----------
+col_left, col_right = st.columns([1, 1], gap="large")
 
-    .accent {
-      position:absolute; left:0; top:0; bottom:0; width:6px;
-      background: linear-gradient(180deg,#6A0DAD,#8B5CF6);
-      border-top-left-radius:18px; border-bottom-left-radius:18px;
-    }
+with col_left:
+    st.markdown(
+        """
+        <div class="slide-container">
+          <div class="col-card">
+            <div class="col-title"><span class="icon-must"></span>Must-Have</div>
+        """,
+        unsafe_allow_html=True
+    )
+    for item in must_haves:
+        st.markdown(
+            f"""
+            <div class="pill must">
+              <span class="icon-must"></span>
+              <div>{item}</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    st.markdown("</div></div>", unsafe_allow_html=True)
 
-    .title {
-      font-weight: 800; font-size: 16px; line-height: 1.35;
-      margin: 0 0 10px 10px; color: #2d1b69;
-    }
+with col_right:
+    st.markdown(
+        """
+        <div class="slide-container">
+          <div class="col-card">
+            <div class="col-title"><span class="icon-nice"></span>Nice-to-Have</div>
+        """,
+        unsafe_allow_html=True
+    )
+    for item in nice_to_haves:
+        st.markdown(
+            f"""
+            <div class="pill nice">
+              <span class="icon-nice"></span>
+              <div>{item}</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    st.markdown("</div></div>", unsafe_allow_html=True)
 
-    /* Dialog bubble for justification */
-    .bubble {
-      background: #F8F5FF;                /* very light purple */
-      border: 1px dashed #D8C9FB;
-      color: #2f2f33;
-      padding: 12px 14px;
-      border-radius: 14px;
-      margin: 2px 0 10px 10px;
-      position: relative;
-    }
-    .bubble:before {
-      content: ""; position: absolute; left: 20px; top: -8px;
-      width: 16px; height: 16px; transform: rotate(45deg);
-      background: #F8F5FF; border-left: 1px dashed #D8C9FB; border-top: 1px dashed #D8C9FB;
-    }
-
-    /* Chips */
-    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-left:10px; }
-    .chip {
-      background: #F3EAFD; color: #4B0082; font-weight: 800;
-      padding: 6px 10px; border-radius: 999px; font-size: 13px;
-      border: 1px solid #E1D6FB;
-    }
-
-    /* Agreement badge */
-    .agree {
-      margin-left: auto; display:flex; align-items:center; gap:8px;
-      padding: 6px 10px; border-radius: 12px; font-weight: 900; font-size: 13px;
-      border: 1px solid;
-    }
-    .ok  { color:#166534; background:#E9FBEE; border-color: #A7F3D0; }
-    .bad { color:#991B1B; background:#FDECEC; border-color: #FCA5A5; }
-
-    /* Small gray label */
-    .k { color:#6B7280; font-size:12px; font-weight:600; }
-  </style>
-  <div class="wrap">
-    <div class="grid">
-"""
-
-cards = []
-for it in items:
-    is_agree = agree(it["ai"], it["orig"])
-    cards.append(f"""
-      <div class="card">
-        <div class="accent"></div>
-        <div class="title">🧾 {it['title']}</div>
-        <div class="bubble">💬 {it['just']}</div>
-        <div class="row">
-          <div class="k">AI decision</div>
-          <div class="chip">{lab(it['ai'])}</div>
-          <div class="k" style="margin-left:12px;">Original</div>
-          <div class="chip">{lab(it['orig'])}</div>
-          <div class="agree {'ok' if is_agree else 'bad'}">{'✅ Agree' if is_agree else '❌ Disagree'}</div>
-        </div>
-      </div>
-    """)
-
-html_tail = """
+# ---------- FOOTER ----------
+st.markdown(
+    """
+    <div class="slide-container footer-note">
+      <div>Criteria v1.0 — Oct 2025 · Icons: check = must-have, dot = nice-to-have · Colors follow WCAG-AA contrast.</div>
     </div>
-  </div>
-</div>
-"""
-
-st.components.v1.html(html_head + "".join(cards) + html_tail, height=860, scrolling=True)
+    """,
+    unsafe_allow_html=True
+)
