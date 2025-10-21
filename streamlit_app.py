@@ -1,148 +1,143 @@
-# app.py
 import streamlit as st
-from textwrap import dedent
 
 st.set_page_config(
     page_title='Addressing "Killer Risks"',
-    page_icon="🛡️",
+    page_icon="🧠",
     layout="wide",
 )
 
-# ---------- THEME & CSS ----------
-CSS = """
+# ---------- STYLES ----------
+st.markdown("""
 <style>
-/* Page background */
 .stApp {
-  background: radial-gradient(1200px 800px at 50% -10%, #1e1b4b 0%, #0b1220 35%, #0b1220 100%);
-  color: #e5e7eb;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  background: linear-gradient(145deg, #c8b6ff 0%, #e3d7ff 30%, #faf6ff 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
+  color: #1e1b4b;
 }
 
-/* Section title */
+/* --- MAIN TITLE --- */
 .h1-title {
-  text-align:center; 
-  font-size: 2.0rem; 
-  font-weight: 800; 
-  color: #ffffff;
-  margin: 0 0 1rem 0;
-  text-shadow: 0 6px 24px rgba(88,101,242,0.25);
+  text-align:center;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #312e81;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  text-shadow: 0 3px 10px rgba(72,61,139,0.15);
 }
 
-/* Card grid */
+/* --- GRID LAYOUT --- */
 .grid { display:grid; gap: 24px; }
-@media (min-width: 992px) {
-  .grid { grid-template-columns: 1fr 1fr; }
-}
+@media (min-width: 992px) { .grid { grid-template-columns: 1fr 1fr; } }
 
-/* Risk card */
+/* --- CARD --- */
 .card {
   position: relative;
-  border-radius: 18px;
-  border: 1.5px solid #2b3344;
-  background: linear-gradient(180deg, rgba(20,26,41,.7), rgba(14,20,32,.55));
-  box-shadow: 0 20px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(140,120,200,0.2);
+  box-shadow: 0 12px 30px rgba(80,60,150,0.1);
   padding: 24px;
-  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  transition: all .25s ease;
 }
 .card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 30px 60px rgba(0,0,0,0.45);
-  border-color: #3b3f55;
+  transform: scale(1.015);
+  box-shadow: 0 18px 40px rgba(80,60,150,0.18);
 }
 
-
-
-
-/* Labels */
+/* --- LABELS --- */
 .label-sm {
-  letter-spacing: .12em; 
-  font-size: .72rem; 
-  font-weight: 700; 
-  opacity:.8; 
-  margin-bottom: .25rem;
+  letter-spacing: .1em;
+  font-size: .7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #7e22ce;
+  margin-bottom: .3rem;
 }
 
-/* Risk title */
+/* --- RISK TITLE --- */
 .risk-title {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 800;
-  margin: .25rem 0 1.25rem 0;
-  color: #fff;
+  margin-bottom: 1rem;
+  color: #1e1b4b;
 }
 
-/* Mitigation box */
+/* --- MITIGATION BOX --- */
 .mitig {
-  border-radius: 14px;
-  padding: 14px 16px;
-  background: rgba(38,49,69,.6);
-  border: 1px solid rgba(103,232,249,.18);
+  border-radius: 10px;
+  background: rgba(240,238,255,0.8);
+  border: 1px solid rgba(140,120,200,0.25);
+  padding: 10px 14px;
 }
-.mitig .label-sm { color: #34d399; }
-.mitig p { margin:0; color:#cfd8e3; }
-
-/* Status row */
-.status { display:flex; align-items:center; gap:8px; margin-top: 12px; color:#93a3b8; font-size:.78rem; }
-.dot { width:8px; height:8px; border-radius:999px; }
-
-/* Animated arrow */
-.arrow {
-  width: 40px; height: 40px; margin: 14px auto;
-  opacity:.9;
+.mitig .label-sm {
+  color: #059669;
+  font-weight: 700;
 }
-@keyframes drop {
-  0% { transform: translateY(-4px); opacity:.8; }
-  50% { transform: translateY(2px); opacity:1; }
-  100% { transform: translateY(-4px); opacity:.8; }
+.mitig p {
+  color: #1e1b4b;
+  margin: 0;
+  font-size: .9rem;
 }
-.arrow path { animation: drop 1.2s infinite ease-in-out; }
 
-/* Footer stat tiles */
-.tiles { display:grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
+/* --- ARROW --- */
+.arrow { width: 36px; height: 36px; margin: 0.5rem auto; opacity: .8; }
+@keyframes floaty {
+  0%,100% { transform: translateY(-3px); }
+  50% { transform: translateY(3px); }
+}
+.arrow path { animation: floaty 1.2s infinite ease-in-out; }
+
+/* --- STATUS --- */
+.status {
+  display:flex; align-items:center; gap:8px;
+  margin-top: 10px;
+  color:#334155;
+  font-size:.78rem;
+}
+.dot { width:7px; height:7px; border-radius:50%; }
+
+/* --- SUMMARY TILES --- */
+.tiles { display:grid; gap: 16px; grid-template-columns: repeat(2, 1fr); margin-top: 2rem; }
 @media (min-width: 992px) { .tiles { grid-template-columns: repeat(4, 1fr); } }
+
 .tile {
-  border-radius: 16px; text-align:center; padding: 16px 10px;
-  border: 1px solid rgba(255,255,255,.08);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+  border-radius: 14px;
+  text-align:center;
+  padding: 16px;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(140,120,200,0.25);
+  box-shadow: 0 8px 20px rgba(100,80,160,0.08);
 }
-.tile .big { font-size: 1.6rem; font-weight: 900; margin-bottom: 4px; }
+.tile .big { font-size: 1.5rem; font-weight: 800; margin-bottom: 4px; }
 .tile .sub { font-size: .85rem; opacity:.9; }
 
-/* Subtle divider spacing */
-.section { margin: 10px 0 26px 0; }
-
-/* Small helper to clamp width of central container */
-.maxw { max-width: 1200px; margin: 0 auto; }
+.maxw { max-width: 1100px; margin: 0 auto; }
 </style>
-"""
-st.markdown(CSS, unsafe_allow_html=True)
-
-st.markdown('<div class="h1-title">Addressing "Killer Risks"</div>', unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # ---------- DATA ----------
 risks = [
     {
-        "id": "heterogeneity",
         "title": "Data Heterogeneity",
         "mitigation": "Standardized HL7/FHIR streams",
-        "arrow_color": "#60a5fa",
-        "status_color": "#60a5fa",
+        "arrow_color": "#3b82f6",
+        "status_color": "#3b82f6",
     },
     {
-        "id": "regulatory",
         "title": "Regulatory Hurdles",
         "mitigation": "Class II SaMD; early engagement with Health Canada",
-        "arrow_color": "#a78bfa",
-        "status_color": "#a78bfa",
+        "arrow_color": "#8b5cf6",
+        "status_color": "#8b5cf6",
     },
     {
-        "id": "adoption",
         "title": "Adoption Resistance",
         "mitigation": "Co-design with OR staff during pilot",
         "arrow_color": "#ec4899",
         "status_color": "#ec4899",
     },
     {
-        "id": "cost",
         "title": "Cost Justification",
         "mitigation": "Demonstrated 6–12 month ROI in simulation",
         "arrow_color": "#10b981",
@@ -151,23 +146,24 @@ risks = [
 ]
 
 stats = [
-    {"big": "100%", "sub": "Data Standardized", "bg": "rgba(59,130,246,.18)", "fg": "#60a5fa", "bd": "rgba(59,130,246,.35)"},
-    {"big": "Class II", "sub": "SaMD Pathway", "bg": "rgba(167,139,250,.18)", "fg": "#a78bfa", "bd": "rgba(167,139,250,.35)"},
-    {"big": "Co-design", "sub": "With OR Staff", "bg": "rgba(236,72,153,.18)", "fg": "#ec4899", "bd": "rgba(236,72,153,.35)"},
-    {"big": "6–12mo", "sub": "ROI Timeline", "bg": "rgba(16,185,129,.18)", "fg": "#10b981", "bd": "rgba(16,185,129,.35)"},
+    {"big": "100%", "sub": "Data Standardized", "fg": "#3b82f6"},
+    {"big": "Class II", "sub": "SaMD Pathway", "fg": "#8b5cf6"},
+    {"big": "Co-design", "sub": "With OR Staff", "fg": "#ec4899"},
+    {"big": "6–12mo", "sub": "ROI Timeline", "fg": "#10b981"},
 ]
 
-# ---------- HELPERS ----------
+# ---------- COMPONENTS ----------
 def risk_card(r):
     arrow_svg = f"""
     <svg class="arrow" viewBox="0 0 40 40" fill="none">
       <path d="M20 10 L20 30 M20 30 L15 25 M20 30 L25 25"
-            stroke="{r['arrow_color']}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            stroke="{r['arrow_color']}" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     """
     html = f"""
     <div class="card">
-      <div class="label-sm" style="color:#fb7185">RISK</div>
+      <div class="label-sm">RISK</div>
       <div class="risk-title">{r['title']}</div>
       {arrow_svg}
       <div class="mitig">
@@ -176,6 +172,7 @@ def risk_card(r):
       </div>
       <div class="status">
         <span class="dot" style="background:{r['status_color']}"></span>
+        <span>Strategy validated</span>
       </div>
     </div>
     """
@@ -183,6 +180,7 @@ def risk_card(r):
 
 def stat_tile(s):
     html = f"""
+    <div class="tile">
       <div class="big" style="color:{s['fg']}">{s['big']}</div>
       <div class="sub" style="color:{s['fg']}">{s['sub']}</div>
     </div>
@@ -190,25 +188,19 @@ def stat_tile(s):
     st.markdown(html, unsafe_allow_html=True)
 
 # ---------- LAYOUT ----------
+st.markdown('<div class="h1-title">Addressing "Killer Risks"</div>', unsafe_allow_html=True)
 st.markdown('<div class="maxw">', unsafe_allow_html=True)
 
-# Risk grid
-st.markdown('<div class="grid section">', unsafe_allow_html=True)
-for i, r in enumerate(risks):
-    # Place two per row using columns for consistent spacing within Streamlit's flow
-    if i % 2 == 0:
-        c1, c2 = st.columns(2, gap="large")
-        with c1:
-            risk_card(risks[i])
-        if i + 1 < len(risks):
-            with c2:
-                risk_card(risks[i + 1])
-st.markdown('</div>', unsafe_allow_html=True)
+# Risk cards grid
+for i in range(0, len(risks), 2):
+    c1, c2 = st.columns(2, gap="large")
+    with c1: risk_card(risks[i])
+    if i + 1 < len(risks):
+        with c2: risk_card(risks[i + 1])
 
 # Summary tiles
-st.markdown('<div class="tiles section">', unsafe_allow_html=True)
+st.markdown('<div class="tiles">', unsafe_allow_html=True)
 for s in stats:
     stat_tile(s)
 st.markdown('</div>', unsafe_allow_html=True)
-
 st.markdown('</div>', unsafe_allow_html=True)
